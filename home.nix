@@ -110,48 +110,54 @@ in
       ack-vim
       {
         plugin = catppuccin-nvim;
-        config = "colorscheme catppuccin-mocha";
+        type = "lua";
+        config = ''vim.cmd.colorscheme "catppuccin-mocha"'';
       }
     ];
 
-    extraConfig = ''
-      set listchars=tab:>\ ,eol:¬
-      set shiftwidth=2
-      set ttyfast
-      set number
-      set scrolloff=10
-      set cursorline
-      set incsearch
-      set hlsearch
-      set laststatus=2
-      set matchtime=1
-      set shell=zsh
-      set redrawtime=10000
-      nnoremap <C-p> :FZF<CR>
-      cnoreabbrev W w
-      cnoreabbrev Q q
-      cnoreabbrev Wq wq
-      cnoreabbrev Wa wa
-      cnoreabbrev wQ wq
-      cnoreabbrev WQ wq
-      cnoreabbrev WQa wqa
-      cnoreabbrev Wqa wqa
-      cnoreabbrev Qa qa
-      cnoreabbrev QA qa
-      cnoreabbrev Sp sp
-      cnoreabbrev Vsp vsp
-      xnoremap <  <gv
-      xnoremap >  >gv
-      nnoremap <leader><space> :nohlsearch<CR>
-      let g:better_whitespace_enabled=1
-      let g:strip_whitespace_on_save=1
-      let g:suda_smart_edit = 1
-      set undofile
-      set undodir=~/.vim/tmp/undo//
-      set dir=~/.vim/tmp/swp//
-      let g:ackprg = 'ag --vimgrep'
-      nnoremap <C-s> :Ag<Space>
+    initLua = ''
+      vim.opt.list = true
+      vim.opt.listchars = { tab = "> ", eol = "¬" }
+      vim.opt.shiftwidth = 2
+      vim.opt.number = true
+      vim.opt.scrolloff = 10
+      vim.opt.cursorline = true
+      vim.opt.incsearch = true
+      vim.opt.hlsearch = true
+      vim.opt.laststatus = 2
+      vim.opt.matchtime = 1
+      vim.opt.shell = "zsh"
+      vim.opt.redrawtime = 10000
 
+      vim.keymap.set("n", "<C-p>", ":FZF<CR>")
+      vim.keymap.set("x", "<", "<gv")
+      vim.keymap.set("x", ">", ">gv")
+      vim.keymap.set("n", "<leader><space>", ":nohlsearch<CR>")
+      vim.keymap.set("n", "<C-s>", ":Ag<Space>")
+
+      vim.cmd [[
+        cnoreabbrev W w
+        cnoreabbrev Q q
+        cnoreabbrev Wq wq
+        cnoreabbrev Wa wa
+        cnoreabbrev wQ wq
+        cnoreabbrev WQ wq
+        cnoreabbrev WQa wqa
+        cnoreabbrev Wqa wqa
+        cnoreabbrev Qa qa
+        cnoreabbrev QA qa
+        cnoreabbrev Sp sp
+        cnoreabbrev Vsp vsp
+      ]]
+
+      vim.g.better_whitespace_enabled = 1
+      vim.g.strip_whitespace_on_save = 1
+      vim.g.suda_smart_edit = 1
+      vim.g.ackprg = "ag --vimgrep"
+
+      vim.opt.undofile = true
+      vim.opt.undodir = vim.fn.expand("~/.vim/tmp/undo//")
+      vim.opt.directory = vim.fn.expand("~/.vim/tmp/swp//")
     '';
   };
 
