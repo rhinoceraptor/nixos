@@ -1,0 +1,296 @@
+{ config, pkgs, lib, ... }:
+
+
+let
+  shortcuts = [ "li" "gh" "phone" "resume" "jl" "email" ];
+
+  mkMatch = name: {
+    trigger = ":${name}:";
+    replace = "{{${name}_val}}";
+    vars = [{
+      name = "${name}_val";
+      type = "shell";
+      params = {
+        cmd = "op item get 'Espanso' --field label=${name} --reveal";
+      };
+    }];
+  };
+in
+{
+  home.username = "jack";
+  home.homeDirectory = "/home/jack";
+  home.stateVersion = "25.05";
+
+  home.packages = [
+    pkgs.git
+    pkgs.wget
+    pkgs.curl
+    pkgs.httpie
+  ];
+
+  programs.git = {
+    enable = true;
+
+    settings = {
+      user = {
+	name = "Jack Lewis";
+	email = "jack@jacklew.is";
+      };
+
+      push = {
+	autoSetupRemote = true;
+      };
+
+      # includes = [{
+      #   condition = "gitdir:~/git/ssai/";
+      #   contents.user = {
+      #     email = "jlewis@silversight.ai";
+      #     name = "Jack Lewis";
+      #   };
+      # }];
+
+      alias = {
+	a = "add";
+	aa = "add -A";
+	b = "branch";
+	bd = "branch -D";
+	c = "commit";
+	cm = "commit -m";
+	co = "checkout";
+	cb = "checkout -b";
+	cl = "clone";
+	d = "diff HEAD --ignore-space-at-eol -b -w";
+	s = "status";
+	st = "stash";
+	sd = "stash shop -p";
+	sp = "stash pop";
+	stls = "stash list";
+	l = "log --pretty=oneline --decorate --abbrev-commit --mac-count=15";
+	ll = "log --graph --pretty=format:'%Cred%h%Creset %an: %s %Creset%Cgreen(%cr)%Creset' --abbrev-commit --date=relative";
+      };
+    };
+  };
+
+  programs.jujutsu = {
+    enable = true;
+    settings = {
+      user = {
+        email = "jack@jacklew.is";
+        name = "Jack Lewis";
+      };
+    };
+  };
+
+  programs.ssh = {
+    enable = true;
+    # extraConfig = ''
+    #   Host *
+    #       IdentityAgent ~/.1password/agent.sock
+    # '';
+  };
+
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    withRuby = true;
+    withPython3 = true;
+    plugins = with pkgs.vimPlugins; [
+      nvim-lspconfig
+      plenary-nvim
+      vim-tmux-navigator
+      telescope-nvim
+      persistence-nvim
+      vim-better-whitespace
+      neo-tree-nvim
+      vim-suda
+      fzf-wrapper
+      vim-jsonnet
+      ack-vim
+      {
+        plugin = catppuccin-nvim;
+        config = "colorscheme catppuccin-mocha";
+      }
+    ];
+
+    extraConfig = ''
+      set listchars=tab:>\ ,eol:¬
+      set shiftwidth=2
+      set ttyfast
+      set number
+      set scrolloff=10
+      set cursorline
+      set incsearch
+      set hlsearch
+      set laststatus=2
+      set matchtime=1
+      set shell=zsh
+      set redrawtime=10000
+      nnoremap <C-p> :FZF<CR>
+      cnoreabbrev W w
+      cnoreabbrev Q q
+      cnoreabbrev Wq wq
+      cnoreabbrev Wa wa
+      cnoreabbrev wQ wq
+      cnoreabbrev WQ wq
+      cnoreabbrev WQa wqa
+      cnoreabbrev Wqa wqa
+      cnoreabbrev Qa qa
+      cnoreabbrev QA qa
+      cnoreabbrev Sp sp
+      cnoreabbrev Vsp vsp
+      xnoremap <  <gv
+      xnoremap >  >gv
+      nnoremap <leader><space> :nohlsearch<CR>
+      let g:better_whitespace_enabled=1
+      let g:strip_whitespace_on_save=1
+      let g:suda_smart_edit = 1
+      set undofile
+      set undodir=~/.vim/tmp/undo//
+      set dir=~/.vim/tmp/swp//
+      let g:ackprg = 'ag --vimgrep'
+      nnoremap <C-s> :Ag<Space>
+
+    '';
+  };
+
+  programs.tmux = {
+    enable = true;
+    extraConfig = ''
+      bind x confirm kill-pane
+      bind X confirm kill-window
+      set -g base-index 1
+      unbind C-b
+      set -g prefix C-a
+      set -g mode-keys vi
+      bind-key C-a send-prefix
+      set -g mouse on
+      bind m set -g mouse on\; display 'Mouse: ON'
+      bind M set -g mouse off\; display 'Mouse: OFF'
+      bind v split-window -h -c "#{pane_current_path}"
+      bind s split-window -c "#{pane_current_path}"
+      bind c new-window -c "$HOME"
+      bind x confirm kill-pane
+      bind R source-file ~/.config/tmux/tmux.conf \; display "Config reloaded!"
+      bind-key < swap-window -t -
+      bind-key > swap-window -t +
+      set-option -g renumber-windows on
+      set-option -g automatic-rename off
+      set-option -g allow-rename off
+      bind-key n command-prompt "rename-window %%"
+      bind -r H resize-pane -L 5
+      bind -r J resize-pane -D 5
+      bind -r K resize-pane -U 5
+      bind -r L resize-pane -R 5
+    '';
+    plugins = with pkgs.tmuxPlugins; [
+      vim-tmux-navigator
+      {
+        plugin = catppuccin;
+        # Must be set before catppuccin loads (home-manager emits this before
+        # the plugin's run-shell). catppuccin defaults these to "#T" (pane
+        # title), so manual rename-window (#W) wasn't reflected in the status bar.
+        extraConfig = ''
+          set -g @catppuccin_window_text " #W"
+          set -g @catppuccin_window_current_text " #W"
+        '';
+      }
+    ];
+  };
+
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      ls = "ls -lAh";
+      update = "sudo nixos-rebuild switch";
+    };
+
+    initContent = ''
+      bindkey -v
+      export KEYTIMEOUT=1
+      bindkey '^w' backward-kill-word
+      bindkey '^p' up-history
+      bindkey '^n' down-history
+
+      KEYTIMEOUT=1
+
+      clear-screen() clear
+      bindkey '^o' clear-screen
+      bindkey -M viins '^?' backward-delete-char
+      bindkey -M viins '^H' backward-delete-char
+      zle -N history-substring-search-up
+      zle -N history-substring-search-down
+      bindkey '^P' history-substring-search-up
+      bindkey '^N' history-substring-search-down
+      zle -N history-substring-search-up
+      zle -N history-substring-search-down
+    '';
+
+    antidote = {
+      enable = true;
+      plugins = [''
+        "mafredri/zsh-async"
+        "sindresorhus/pure"
+        "zsh-users/zsh-syntax-highlighting"
+        "zsh-users/zsh-history-substring-search"
+        "zsh-users/zsh-completions"
+      ''];
+    };
+  };
+
+  programs.wezterm = {
+    enable = true;
+    enableZshIntegration = true;
+    extraConfig = ''
+      local wezterm = require "wezterm"
+      return {
+        color_scheme = "Catppuccin Mocha",
+	keys = {
+	  { key = "F11", action = wezterm.action.ToggleFullScreen },
+	},
+      }
+    '';
+  };
+
+  services.espanso = {
+    enable = true;
+    package = pkgs.espanso-wayland;
+    configs = {
+      default = {
+	show_notifications = false;
+      };
+    };
+    matches = {
+      default = {
+        matches = map mkMatch shortcuts;
+      };
+    };
+  };
+
+  xdg.desktopEntries."chromium-browser" = {
+    name = "Chromium";
+    exec = "chromium %U";
+    icon = "chromium";
+    categories = [ "Network" "WebBrowser" ];
+  };
+
+  home.file = {
+  };
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
+
+  home.sessionPath = [
+    "${config.home.homeDirectory}/.local/bin"
+    "${config.home.homeDirectory}/.cargo/bin"
+  ];
+
+  programs.home-manager.enable = true;
+}
+
