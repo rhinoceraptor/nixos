@@ -52,11 +52,13 @@
   services.desktopManager.gnome.enable = true;
 
   users.defaultUserShell = pkgs.zsh;
-  users.groups.plugdev = {};
+  users.groups.ubertooth = {};
+
+  services.udev.packages = [ pkgs.ubertooth pkgs.python312Packages.rfcat ];
 
   users.users.jack = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "networkmanager" "video" "dialout" ];
+    extraGroups = [ "wheel" "docker" "networkmanager" "video" "dialout" "ubertooth" ];
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -119,7 +121,6 @@
     tesseract
     wl-clipboard
     dig
-    python314
     vlc
     hyfetch
     zip
@@ -176,6 +177,8 @@
     gnuradio
     can-utils
     wireshark
+    python314
+    python312Packages.rfcat
   ];
 
   virtualisation.docker.enable = true;
