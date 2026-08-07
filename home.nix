@@ -194,6 +194,7 @@ in
       set -g mode-keys vi
       bind-key C-a send-prefix
       set -g mouse on
+      set -g focus-events on
       bind m set -g mouse on\; display 'Mouse: ON'
       bind M set -g mouse off\; display 'Mouse: OFF'
       bind v split-window -h -c "#{pane_current_path}"

@@ -44,7 +44,9 @@
 
   networking.hostName = "x13";
   networking.networkmanager.enable = true;
-  time.timeZone = "America/Detroit";
+  # time.timeZone = "America/Detroit";
+  services.automatic-timezoned.enable = true;
+  services.geoclue2.enable = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   services.xserver.enable = true;
