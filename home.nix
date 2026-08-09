@@ -1,21 +1,5 @@
 { config, pkgs, lib, ... }:
 
-
-let
-  shortcuts = [ "li" "gh" "phone" "resume" "jl" "email" ];
-
-  mkMatch = name: {
-    trigger = ":${name}:";
-    replace = "{{${name}_val}}";
-    vars = [{
-      name = "${name}_val";
-      type = "shell";
-      params = {
-        cmd = "op item get 'Espanso' --field label=${name} --reveal";
-      };
-    }];
-  };
-in
 {
   home.username = "jack";
   home.homeDirectory = "/home/jack";
@@ -33,12 +17,12 @@ in
 
     settings = {
       user = {
-	name = "Jack Lewis";
-	email = "jack@jacklew.is";
+        name = "Jack Lewis";
+        email = "jack@jacklew.is";
       };
 
       push = {
-	autoSetupRemote = true;
+        autoSetupRemote = true;
       };
 
       # Any clone of the silversight-ai org is transparently rewritten to the
@@ -48,23 +32,23 @@ in
       url."git@github-work:silversight-ai/".insteadOf = "git@github.com:silversight-ai/";
 
       alias = {
-	a = "add";
-	aa = "add -A";
-	b = "branch";
-	bd = "branch -D";
-	c = "commit";
-	cm = "commit -m";
-	co = "checkout";
-	cb = "checkout -b";
-	cl = "clone";
-	d = "diff HEAD --ignore-space-at-eol -b -w";
-	s = "status";
-	st = "stash";
-	sd = "stash shop -p";
-	sp = "stash pop";
-	stls = "stash list";
-	l = "log --pretty=oneline --decorate --abbrev-commit --mac-count=15";
-	ll = "log --graph --pretty=format:'%Cred%h%Creset %an: %s %Creset%Cgreen(%cr)%Creset' --abbrev-commit --date=relative";
+        a = "add";
+        aa = "add -A";
+        b = "branch";
+        bd = "branch -D";
+        c = "commit";
+        cm = "commit -m";
+        co = "checkout";
+        cb = "checkout -b";
+        cl = "clone";
+        d = "diff HEAD --ignore-space-at-eol -b -w";
+        s = "status";
+        st = "stash";
+        sd = "stash shop -p";
+        sp = "stash pop";
+        stls = "stash list";
+        l = "log --pretty=oneline --decorate --abbrev-commit --mac-count=15";
+        ll = "log --graph --pretty=format:'%Cred%h%Creset %an: %s %Creset%Cgreen(%cr)%Creset' --abbrev-commit --date=relative";
       };
     };
 
@@ -290,26 +274,16 @@ in
       local wezterm = require "wezterm"
       return {
         color_scheme = "Catppuccin Mocha",
-	keys = {
-	  { key = "F11", action = wezterm.action.ToggleFullScreen },
-	},
+        hide_tab_bar_if_only_one_tab = true,
+        window_content_alignment = {
+          horizontal = 'Center',
+          vertical = 'Bottom',
+        },
+        keys = {
+          { key = "F11", action = wezterm.action.ToggleFullScreen },
+        },
       }
     '';
-  };
-
-  services.espanso = {
-    enable = true;
-    package = pkgs.espanso-wayland;
-    configs = {
-      default = {
-	show_notifications = false;
-      };
-    };
-    matches = {
-      default = {
-        matches = map mkMatch shortcuts;
-      };
-    };
   };
 
   xdg.desktopEntries."chromium-browser" = {
