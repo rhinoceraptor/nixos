@@ -152,6 +152,17 @@ in
       vim.opt.redrawtime = 10000
 
       vim.keymap.set("n", "<C-p>", ":FZF<CR>")
+      vim.keymap.set("n", "<F3>", ":Neotree toggle<CR>", { silent = true })
+
+      require("neo-tree").setup({
+        filesystem = {
+          filtered_items = {
+            visible = true,
+            hide_dotfiles = false,
+            hide_gitignored = false,
+          },
+        },
+      })
       vim.keymap.set("x", "<", "<gv")
       vim.keymap.set("x", ">", ">gv")
       vim.keymap.set("n", "<leader><space>", ":nohlsearch<CR>")

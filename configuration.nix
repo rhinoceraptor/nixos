@@ -44,7 +44,6 @@
 
   networking.hostName = "x13";
   networking.networkmanager.enable = true;
-  # time.timeZone = "America/Detroit";
   services.automatic-timezoned.enable = true;
   services.geoclue2.enable = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -181,6 +180,7 @@
     wireshark
     python314
     python312Packages.rfcat
+    arp-scan
   ];
 
   virtualisation.docker.enable = true;
