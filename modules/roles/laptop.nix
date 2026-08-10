@@ -1,8 +1,10 @@
-# Laptop role: mobility (auto timezone, geolocation), memory pressure relief,
-# and suspend fixes.
+# Laptop role: the shared graphical base plus mobility (auto timezone,
+# geolocation), memory pressure relief, and suspend fixes.
 { ... }:
 
 {
+  imports = [ ./graphical.nix ];
+
   services.automatic-timezoned.enable = true;
   services.geoclue2.enable = true;
   zramSwap.enable = true;

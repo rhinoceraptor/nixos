@@ -16,6 +16,13 @@
   hardware.enableRedistributableFirmware = true;
   services.fwupd.enable = true;
 
+  # Bluetooth
+  hardware.bluetooth.enable = true;
+
+  # Packet capture — installs wireshark plus the setuid dumpcap wrapper and
+  # the `wireshark` group (members can capture without root).
+  programs.wireshark.enable = true;
+
   # Shell
   users.defaultUserShell = pkgs.zsh;
   programs.zsh.enable = true;
@@ -36,55 +43,66 @@
   # Primary user. Hosts append machine-specific groups (e.g. hardware access).
   users.users.jack = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "networkmanager" "video" "dialout" ];
+    extraGroups = [ "wheel" "docker" "networkmanager" "video" "dialout" "wireshark" ];
   };
 
   environment.systemPackages = with pkgs; [
-    git
-    vim
+    # Editors
     neovim
-    wget
-    tmux
+
+    # Version control
+    git
     jujutsu
-    google-cloud-sdk
-    opentofu
+
+    # Shell / terminal utilities
+    tmux
     tree
-    stdenv
-    gnumake
-    gcc
-    pkg-config
-    dbus
     htop
-    unzip
-    zip
+    hyfetch
     rsync
     silver-searcher
-    uv
-    dig
-    hyfetch
     jq
-    bpftrace
-    nodejs_24
-    usbutils
-    dotnet-sdk_10
-    util-linux
-    jsonnet
-    gemini-cli
+    unzip
+    zip
     envsubst
-    cursor-cli
+
+    # Language toolchains & build tools
+    gcc
+    gnumake
+    pkg-config
+    rustup
+    nodejs_24
+    python314
+    dotnet-sdk_10
+    uv
+
+    # Cloud / infrastructure-as-code
+    google-cloud-sdk
+    opentofu
+    jsonnet
+
+    # AI coding assistants
     claude-code
     codex
-    pandoc
-    wireshark
-    python314
+    gemini-cli
+    cursor-cli
+
+    # Networking (wireshark is enabled via programs.wireshark above)
+    wget
+    dig
     arp-scan
+
+    # Disks / hardware / kernel tracing
+    usbutils
     nvme-cli
     ldmtool
     parted
+    bpftrace
+
+    # Documents & media
+    pandoc
     imagemagick
     tesseract
-    bluez
-    rustup
     (texlive.combine {
       inherit (texlive)
         scheme-small

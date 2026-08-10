@@ -1,11 +1,10 @@
-# Thinkpad X13 — laptop + desktop, ZFS-on-LUKS, TPM, SDR/RF hobby hardware.
+# Thinkpad X13 — laptop, ZFS-on-LUKS, TPM, SDR/RF hobby hardware.
 { config, lib, pkgs, inputs, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
     ../../modules/zfs.nix
-    ../../modules/roles/desktop.nix
     ../../modules/roles/laptop.nix
     inputs.lanzaboote.nixosModules.lanzaboote
   ];
@@ -36,23 +35,6 @@
     pkcs11.enable = true;
     tctiEnvironment.enable = true;
   };
-
-  # SDR / RF / CAN / embedded hobby hardware
-  users.groups.ubertooth = {};
-  users.users.jack.extraGroups = [ "ubertooth" ];
-  services.udev.packages = [ pkgs.ubertooth pkgs.python312Packages.rfcat ];
-  environment.systemPackages = with pkgs; [
-    sbctl
-    tpm2-tools
-    cryptsetup
-    esptool
-    ubertooth
-    hackrf
-    gqrx
-    gnuradio
-    can-utils
-    python312Packages.rfcat
-  ];
 
   home-manager.users.jack.imports = [
     ../../home/common.nix
