@@ -1,5 +1,5 @@
 {
-  description = "Thinkpad X13";
+  description = "NixOS fleet (x13, mouse, tank)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -13,20 +13,30 @@
     };
   };
 
-  outputs = { self, nixpkgs, lanzaboote, home-manager, ... }: {
-    nixosConfigurations.x13 = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hardware-configuration.nix
-        ./configuration.nix
-        lanzaboote.nixosModules.lanzaboote
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.jack = import ./home.nix;
-        }
-      ];
+  outputs = inputs@{ self, nixpkgs, lanzaboote, home-manager, ... }:
+    let
+      # Each host is `./hosts/<name>` (which imports the roles it needs) plus
+      # the universal common module and home-manager wiring.
+      mkHost = hostname: nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./modules/common.nix
+          ./hosts/${hostname}
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+          }
+        ];
+      };
+    in
+    {
+      nixosConfigurations = {
+        x13 = mkHost "x13";
+        mouse = mkHost "mouse";
+        tank = mkHost "tank";
+      };
     };
-  };
 }

@@ -1,3 +1,4 @@
+# Universal home-manager config for jack — imported on every host.
 { config, pkgs, lib, ... }:
 
 {
@@ -267,32 +268,6 @@
     };
   };
 
-  programs.wezterm = {
-    enable = true;
-    enableZshIntegration = true;
-    extraConfig = ''
-      local wezterm = require "wezterm"
-      return {
-        color_scheme = "Catppuccin Mocha",
-        hide_tab_bar_if_only_one_tab = true,
-        window_content_alignment = {
-          horizontal = 'Center',
-          vertical = 'Bottom',
-        },
-        keys = {
-          { key = "F11", action = wezterm.action.ToggleFullScreen },
-        },
-      }
-    '';
-  };
-
-  xdg.desktopEntries."chromium-browser" = {
-    name = "Chromium";
-    exec = "chromium %U";
-    icon = "chromium";
-    categories = [ "Network" "WebBrowser" ];
-  };
-
   home.file = {
     # Public keys for the 1Password SSH agent. `IdentitiesOnly=yes` + `-i` in
     # git's core.sshCommand makes ssh offer only the matching agent key, so
@@ -325,4 +300,3 @@
 
   programs.home-manager.enable = true;
 }
-
