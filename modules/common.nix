@@ -71,6 +71,7 @@
     gnumake
     pkg-config
     rustup
+    pnpm
     nodejs_24
     python314
     dotnet-sdk_10
