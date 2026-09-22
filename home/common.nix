@@ -1,6 +1,47 @@
 # Universal home-manager config for jack — imported on every host.
 { config, pkgs, lib, ... }:
 
+let
+  tmuxStatusRight = pkgs.writeShellApplication {
+    name = "tmux-status-right";
+    runtimeInputs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [ upower gawk ]);
+    text = ''
+      battery() {
+        local BATTERY="🔋️" CHARGER="🔌️" PERCENTAGE="" STATE=""
+
+        if [[ "$(uname)" == "Linux" ]]; then
+          local BAT_PATH UPOWER
+          BAT_PATH=$(upower -e | grep 'BAT' || true)
+          [[ -z "$BAT_PATH" ]] && return
+          UPOWER=$(upower -i "$BAT_PATH")
+          getfield() { echo "$UPOWER" | awk -v field="$1" 'match($0, field) { print $2 }'; }
+          PERCENTAGE=$(getfield "percentage")
+          [[ "$(getfield "state")" =~ .*"discharging".* ]] && STATE="$BATTERY" || STATE="$CHARGER"
+
+        elif [[ "$(uname)" == "Darwin" ]]; then
+          local POWER
+          POWER=$(pmset -g batt)
+          PERCENTAGE=$(echo "$POWER" | grep -oE "[0-9]{2,3}%")
+          pmset -g batt | grep -q "Battery Power" && STATE="$BATTERY" || STATE="$CHARGER"
+        fi
+
+        if [[ -n "$PERCENTAGE" && -n "$STATE" ]]; then
+          local COLOR
+          case $PERCENTAGE in
+            100%|9[0-9]%|8[0-9]%|7[0-9]%) COLOR="#[bg=#98c379]#[fg=#2a2f39]" ;;
+            6[0-9]%|5[0-9]%|4[0-9]%|3[0-9]%) COLOR="#[bg=#e5c07b]#[fg=#2a2f39]" ;;
+            2[0-9]%|1[0-9]%|[0-9]%) COLOR="#[bg=#e06c75]#[fg=#2a2f39]" ;;
+          esac
+          printf "%s " "$COLOR $PERCENTAGE $STATE #[default]"
+        fi
+      }
+
+      battery
+      printf "%s" "$(date +'%a %b %d %I:%M %p') "
+    '';
+  };
+in
+
 {
   home.username = "jack";
   home.homeDirectory = "/home/jack";
@@ -208,6 +249,8 @@
       bind -r J resize-pane -D 5
       bind -r K resize-pane -U 5
       bind -r L resize-pane -R 5
+      set -g status-right "#(${tmuxStatusRight}/bin/tmux-status-right)"
+      set -g status-interval 10
     '';
     plugins = with pkgs.tmuxPlugins; [
       vim-tmux-navigator
@@ -287,6 +330,8 @@
       [[ssh-keys]]
       vault = "Silversight.ai"
     '';
+
+
   };
 
   home.sessionVariables = {
