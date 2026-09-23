@@ -1,14 +1,6 @@
 # Universal home-manager config for jack — imported on every host.
 { config, pkgs, lib, ... }:
 
-let
-  tmuxStatusRight = pkgs.writeShellApplication {
-    name = "tmux-status-right";
-    runtimeInputs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [ upower gawk ]);
-    text = builtins.readFile ./scripts/tmux-status-right.sh;
-  };
-in
-
 {
   home.username = "jack";
   home.homeDirectory = "/home/jack";
@@ -19,6 +11,10 @@ in
     pkgs.wget
     pkgs.curl
     pkgs.httpie
+  ] ++ lib.optionals pkgs.stdenv.isLinux [
+    # tmux-battery prefers acpi over upower (lower CPU usage); guarantee it's
+    # present rather than depending on some other module pulling it in.
+    pkgs.acpi
   ];
 
   programs.git = {
@@ -216,7 +212,6 @@ in
       bind -r J resize-pane -D 5
       bind -r K resize-pane -U 5
       bind -r L resize-pane -R 5
-      set -g status-right "#(${tmuxStatusRight}/bin/tmux-status-right)"
       set -g status-interval 1
     '';
     plugins = with pkgs.tmuxPlugins; [
@@ -229,6 +224,39 @@ in
         extraConfig = ''
           set -g @catppuccin_window_text " #W"
           set -g @catppuccin_window_current_text " #W"
+        '';
+      }
+      {
+        plugin = battery.overrideAttrs (old: {
+          # Upstream bug: scripts/helpers.sh's is_wsl() treats the substring
+          # "Linux" in /proc/version as a WSL signal, but that string is
+          # present on every Linux kernel, not just WSL. This makes
+          # battery_remain.sh always take the WSL branch first (reading
+          # charge_now/charge_full/current_now from sysfs), which errors out
+          # with nothing on stdout on real hardware whose battery driver
+          # reports energy_now/energy_full/power_now instead (confirmed on
+          # this machine) — #{battery_remain} silently renders blank.
+          # Narrow the check to the actual WSL signal.
+          postInstall = (old.postInstall or "") + ''
+            substituteInPlace $out/share/tmux-plugins/battery/scripts/helpers.sh \
+              --replace-fail '"$version" == *"Linux"* || ' ""
+          '';
+        });
+        # status-right has to be set here rather than in the top-level
+        # extraConfig above: home-manager emits that via mkAfter (i.e. after
+        # every plugin's run-shell), but tmux-battery's #{battery_*} tokens
+        # aren't live tmux format variables — battery.tmux does a one-time
+        # textual substitution into status-right's *current* value when its
+        # own run-shell executes, so the placeholders must already be in
+        # status-right (and catppuccin's default status-right already
+        # overridden) by that point. This also runs after catppuccin above,
+        # so it wins over catppuccin's own default status-right.
+        #
+        # battery_charging_watts is macOS-only (empty string on Linux) but
+        # harmless to include everywhere.
+        extraConfig = ''
+          set -g @batt_remain_short 'true'
+          set -g status-right '#{battery_color_bg} #{battery_percentage} #{battery_icon_status} #{battery_remain} #{battery_charging_watts}#[default] %a %b %d %I:%M %p '
         '';
       }
     ];
