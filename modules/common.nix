@@ -58,7 +58,7 @@
     tmux
     tree
     htop
-    hyfetch
+    fastfetch
     rsync
     silver-searcher
     jq
@@ -85,7 +85,7 @@
     # AI coding assistants
     claude-code
     codex
-    gemini-cli
+    antigravity-cli
     cursor-cli
 
     # Networking (wireshark is enabled via programs.wireshark above)
