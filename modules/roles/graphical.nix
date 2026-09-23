@@ -65,6 +65,7 @@
     gimp
     krita
     inkscape
+    darktable
 
     # Productivity & notes
     obsidian
