@@ -58,16 +58,6 @@
     };
   };
 
-  programs.jujutsu = {
-    enable = true;
-    settings = {
-      user = {
-        email = "jack@jacklew.is";
-        name = "Jack Lewis";
-      };
-    };
-  };
-
   programs.ssh = {
     enable = true;
     settings = {
