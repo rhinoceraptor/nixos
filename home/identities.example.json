@@ -1,0 +1,16 @@
+{
+  "_comment": "Copy this to ~/.config/nixos-identities.json (untracked, outside this repo) and edit. See home/scripts/generate-identities.sh for exactly how each field is used.",
+  "sshKeys": [
+    {
+      "1passwordName": "Personal GitHub",
+      "default": true
+    },
+    {
+      "1passwordName": "Some Employer",
+      "default": false,
+      "path": "~/git/work",
+      "alias": "github-work",
+      "githubOrgs": ["some-employer-org"]
+    }
+  ]
+}

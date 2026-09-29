@@ -2,6 +2,8 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [ ./identities.nix ];
+
   home.username = "jack";
   home.homeDirectory = "/home/jack";
   home.stateVersion = "25.05";
@@ -23,18 +25,16 @@
     settings = {
       user = {
         name = "Jack Lewis";
-        email = "jack@jacklew.is";
+        # No email here: it comes from the generated include in
+        # home/identities.nix, so this file has none to leak. `git commit`
+        # errors with "Please tell me who you are" until that's generated
+        # (i.e. until ~/.config/nixos-identities.json exists and `op` is
+        # signed in) — a clear failure rather than a wrong-identity commit.
       };
 
       push = {
         autoSetupRemote = true;
       };
-
-      # Any clone of the silversight-ai org is transparently rewritten to the
-      # github-work SSH alias, so it uses the work key even with a normal
-      # git@github.com:silversight-ai/... URL. Applies at clone time (unlike
-      # gitdir includes), and the rewrite persists for later fetch/push.
-      url."git@github-work:silversight-ai/".insteadOf = "git@github.com:silversight-ai/";
 
       alias = {
         a = "add";
@@ -56,14 +56,6 @@
         ll = "log --graph --pretty=format:'%Cred%h%Creset %an: %s %Creset%Cgreen(%cr)%Creset' --abbrev-commit --date=relative";
       };
     };
-
-    # Repos under ~/git/work/ commit as the Silversight identity. The SSH *key*
-    # is selected by host alias (see programs.ssh below), not here — core.sshCommand
-    # can't be used for this because it doesn't apply during `git clone`.
-    includes = [{
-      condition = "gitdir:~/git/work/";
-      contents.user.email = "jlewis@silversight.ai";
-    }];
   };
 
   programs.jujutsu = {
@@ -82,21 +74,8 @@
       # Route all SSH auth through the 1Password agent.
       "*".IdentityAgent = "~/.1password/agent.sock";
 
-      # Personal GitHub (default) -> personal key only.
-      "github.com" = {
-        IdentitiesOnly = true;
-        IdentityFile = "~/.ssh/id_personal.pub";
-      };
-
-      # Work GitHub: clone/remote as git@github-work:ORG/repo.git to use the
-      # Silversight key. Same real host (github.com), different account, so an
-      # alias is the only way ssh can tell them apart.
-      "github-work" = {
-        HostName = "github.com";
-        User = "git";
-        IdentitiesOnly = true;
-        IdentityFile = "~/.ssh/id_work.pub";
-      };
+      # Per-identity Host blocks (github.com plus any github-<alias> work
+      # accounts) come from the generated include in home/identities.nix.
     };
   };
 
@@ -306,28 +285,8 @@
     };
   };
 
-  home.file = {
-    # Public keys for the 1Password SSH agent. `IdentitiesOnly=yes` + `-i` in
-    # git's core.sshCommand makes ssh offer only the matching agent key, so
-    # personal and work repos can't cross-authenticate.
-    ".ssh/id_personal.pub".text =
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuoCQe9g7LnKmnhLbiDE1UT0VkKNX43ofVvQODSVPKC8LspC0Ivi9M5paHLhGupdcGJEc9azVzdL4iP7I6c56if2UAGGp/IFe6tezokmfn4QoGKbjXXOZKl3wR4vs54XpSHUnUlW9UYBXwbk54ksp+TC5BU4RfPtHtXEXIQa8cUf9g5GXuyS0jyjz6JzooYGoFD/8IUU4il+N1aN3Xx8n9Le+0UOc0CovpUQe6RYXatr3luBA/GZNKTj9sM8NYZ7jtoKmtQp4lXn877Gzcw4JHuNmzWAWMDwcyCAICH0EQDZEk2olPXU7lqdr1l9APtSOBywJI5lMGJxPwqruiTjJW2gVGh1nE3jmUcl2+ZJvsXBK32Du7XBOt+E9Vi8Tl/9pGouvHHs+dJc62vrWjDH0pkbz7WoouAZ3ls1pFHb4hllFKjvVsQIO2kb/87/sI/odvs1+Jp/pLnp5elAGlpX3l0XQqMsrEBcOt8qmqvHfWw34ugCnh7j13Lw7EazoZf6E= Jack Personal (1Password)\n";
-    ".ssh/id_work.pub".text =
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA2GSggeyH8qm1W9usBHFeaTgj9GQGuUU+fXHjNfo0ew Silversight.ai (1Password)\n";
-
-    # 1Password SSH agent: which vaults' keys it serves. Personal holds the
-    # personal key; Silversight.ai holds the work key. Without this, the agent
-    # only serves the Private/Personal vault and the work key is invisible.
-    ".config/1Password/ssh/agent.toml".text = ''
-      [[ssh-keys]]
-      vault = "Personal"
-
-      [[ssh-keys]]
-      vault = "Silversight.ai"
-    '';
-
-
-  };
+  # Public keys, the 1Password agent's vault list, and per-identity SSH/git
+  # config are all generated at activation time — see home/identities.nix.
 
   home.sessionVariables = {
     EDITOR = "nvim";
