@@ -47,14 +47,10 @@
     chromium
 
     # Communication
-    slack
-    discord
     signal-desktop
     element-desktop
-    zoom-us
 
     # Media
-    spotify
     vlc
     ffmpeg-full
     obs-studio
@@ -97,6 +93,12 @@
     gnuradio
     can-utils
     python312Packages.rfcat
+  ] ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
+    # No Linux aarch64 build upstream.
+    slack
+    discord
+    zoom-us
+    spotify
   ];
 
   # Embedded system setup

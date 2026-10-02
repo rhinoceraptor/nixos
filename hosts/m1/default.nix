@@ -13,6 +13,10 @@
   ];
 
   networking.hostName = "m1";
+
+  # Broadcom wifi on Asahi only works via iwd; wpa_supplicant (the
+  # NetworkManager default) can't drive this card.
+  networking.networkmanager.wifi.backend = "iwd";
   # This machine was first installed via the Asahi installer's unstable-based
   # ISO, which self-reports as 26.11 — unlike the other hosts, this is NOT
   # "26.05" to match them. stateVersion records whatever version a machine
@@ -30,6 +34,18 @@
   # where the Asahi installer put it), but breaks evaluation from any other
   # machine. Pin it explicitly instead.
   hardware.asahi.peripheralFirmwareDirectory = "/boot/vendorfw";
+
+  # The firmware-extraction derivation above reads that path directly in its
+  # builder; the Nix build sandbox otherwise only exposes /nix/store, so
+  # without this the build fails with "firmware.cpio missing" even though the
+  # file is right there.
+  nix.settings.extra-sandbox-paths = [ "/boot/vendorfw" ];
+
+  # Defaults to true whenever hardware.asahi.enable is, but the current
+  # nixos-apple-silicon release references pkgs.avd-fw in its video module
+  # without actually defining it in the overlay — evaluation fails with
+  # "attribute 'avd-fw' missing". Disable until upstream ships the package.
+  hardware.asahi.avd.enable = false;
 
   # Asahi's U-Boot already presents the UEFI environment the Asahi installer
   # set up (one per installed OS, picked via the Mac's own boot picker);

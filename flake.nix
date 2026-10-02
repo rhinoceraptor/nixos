@@ -67,7 +67,12 @@
         # MacBook Pro (M1), bare-metal Asahi Linux. See hosts/m1/default.nix.
         m1 = mkHost "m1" {
           system = "aarch64-linux";
-          extraModules = [ nixos-apple-silicon.nixosModules.default ];
+          extraModules = [
+            nixos-apple-silicon.nixosModules.default
+            # Provides the Apple Silicon firmware/GPU/kernel packages (e.g.
+            # pkgs.avd-fw) the module above references.
+            { nixpkgs.overlays = [ nixos-apple-silicon.overlays.default ]; }
+          ];
         };
       };
     };
