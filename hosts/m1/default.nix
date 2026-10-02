@@ -47,6 +47,14 @@
   # "attribute 'avd-fw' missing". Disable until upstream ships the package.
   hardware.asahi.avd.enable = false;
 
+  # The internal keyboard still shows up as an Apple HID keyboard (driven by
+  # the generic hid_apple module even under Asahi), so the usual Mac
+  # fnmode knob applies: 2 = F1-F12 act as plain function keys by default,
+  # hold Fn for brightness/volume/etc (the opposite of macOS's own default).
+  boot.extraModprobeConfig = ''
+    options hid_apple fnmode=2
+  '';
+
   # Asahi's U-Boot already presents the UEFI environment the Asahi installer
   # set up (one per installed OS, picked via the Mac's own boot picker);
   # systemd-boot sits on top of that but must not try to manage EFI variables

@@ -26,6 +26,10 @@
         "org/gnome/desktop/peripherals/mouse" = {
           natural-scroll = true;
         };
+        "org/gnome/desktop/wm/keybindings" = {
+          switch-to-workspace-left = [ "<Super><Control>h" "<Super><Control>Left" ];
+          switch-to-workspace-right = [ "<Super><Control>l" "<Super><Control>Right" ];
+        };
       };
     }
   ];
