@@ -1,5 +1,4 @@
-# ZFS support. Import on hosts that use ZFS; each such host must also set a
-# unique `networking.hostId`.
+# ZFS support. Import on hosts with ZFS, also set unique `networking.hostId`.
 { ... }:
 
 {

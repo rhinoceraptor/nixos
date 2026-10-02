@@ -1,60 +1,48 @@
-# Universal system config — imported by every host regardless of role.
 { config, lib, pkgs, ... }:
 
 {
-  # Nix / flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Boot loader (sensible default; hosts may override for their firmware).
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Networking
   networking.networkmanager.enable = true;
 
-  # Firmware + updates
   hardware.enableRedistributableFirmware = true;
   services.fwupd.enable = true;
 
-  # Bluetooth
   hardware.bluetooth.enable = true;
 
-  # Packet capture — installs wireshark plus the setuid dumpcap wrapper and
-  # the `wireshark` group (members can capture without root).
   programs.wireshark.enable = true;
 
-  # Shell
   users.defaultUserShell = pkgs.zsh;
   programs.zsh.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
-  # Remote access / mesh VPN
   services.openssh.enable = true;
   services.tailscale.enable = true;
 
-  # Containers / dev
   virtualisation.docker.enable = true;
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
   };
 
-  # Primary user. Hosts append machine-specific groups (e.g. hardware access).
   users.users.jack = {
     isNormalUser = true;
     extraGroups = [ "wheel" "docker" "networkmanager" "video" "dialout" "wireshark" ];
   };
 
   environment.systemPackages = with pkgs; [
-    # Editors
+    # editors
     neovim
 
-    # Version control
+    # version control
     git
     jujutsu
 
-    # Shell / terminal utilities
+    # shell utilities
     tmux
     tree
     htop
@@ -66,7 +54,7 @@
     zip
     envsubst
 
-    # Language toolchains & build tools
+    # toolchains and build tools
     gcc
     gnumake
     pkg-config
@@ -77,30 +65,30 @@
     dotnet-sdk_10
     uv
 
-    # Cloud / infrastructure-as-code
+    # cloud
     google-cloud-sdk
     opentofu
     jsonnet
 
-    # AI coding assistants
+    # slop generators
     claude-code
     codex
     antigravity-cli
     cursor-cli
 
-    # Networking (wireshark is enabled via programs.wireshark above)
+    # networking
     wget
     dig
     arp-scan
 
-    # Disks / hardware / kernel tracing
+    # etc
     usbutils
     nvme-cli
     ldmtool
     parted
     bpftrace
 
-    # Documents & media
+    # docs
     pandoc
     imagemagick
     tesseract

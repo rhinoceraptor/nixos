@@ -1,4 +1,3 @@
-# Universal home-manager config for jack — imported on every host.
 { config, pkgs, lib, ... }:
 
 {
@@ -14,8 +13,6 @@
     pkgs.curl
     pkgs.httpie
   ] ++ lib.optionals pkgs.stdenv.isLinux [
-    # tmux-battery prefers acpi over upower (lower CPU usage); guarantee it's
-    # present rather than depending on some other module pulling it in.
     pkgs.acpi
   ];
 
@@ -25,11 +22,6 @@
     settings = {
       user = {
         name = "Jack Lewis";
-        # No email here: it comes from the generated include in
-        # home/identities.nix, so this file has none to leak. `git commit`
-        # errors with "Please tell me who you are" until that's generated
-        # (i.e. until ~/.config/nixos-identities.json exists and `op` is
-        # signed in) — a clear failure rather than a wrong-identity commit.
       };
 
       push = {
@@ -61,11 +53,7 @@
   programs.ssh = {
     enable = true;
     settings = {
-      # Route all SSH auth through the 1Password agent.
       "*".IdentityAgent = "~/.1password/agent.sock";
-
-      # Per-identity Host blocks (github.com plus any github-<alias> work
-      # accounts) come from the generated include in home/identities.nix.
     };
   };
 
@@ -187,9 +175,6 @@
       vim-tmux-navigator
       {
         plugin = catppuccin;
-        # Must be set before catppuccin loads (home-manager emits this before
-        # the plugin's run-shell). catppuccin defaults these to "#T" (pane
-        # title), so manual rename-window (#W) wasn't reflected in the status bar.
         extraConfig = ''
           set -g @catppuccin_window_text " #W"
           set -g @catppuccin_window_current_text " #W"
@@ -197,32 +182,11 @@
       }
       {
         plugin = battery.overrideAttrs (old: {
-          # Upstream bug: scripts/helpers.sh's is_wsl() treats the substring
-          # "Linux" in /proc/version as a WSL signal, but that string is
-          # present on every Linux kernel, not just WSL. This makes
-          # battery_remain.sh always take the WSL branch first (reading
-          # charge_now/charge_full/current_now from sysfs), which errors out
-          # with nothing on stdout on real hardware whose battery driver
-          # reports energy_now/energy_full/power_now instead (confirmed on
-          # this machine) — #{battery_remain} silently renders blank.
-          # Narrow the check to the actual WSL signal.
           postInstall = (old.postInstall or "") + ''
             substituteInPlace $out/share/tmux-plugins/battery/scripts/helpers.sh \
               --replace-fail '"$version" == *"Linux"* || ' ""
           '';
         });
-        # status-right has to be set here rather than in the top-level
-        # extraConfig above: home-manager emits that via mkAfter (i.e. after
-        # every plugin's run-shell), but tmux-battery's #{battery_*} tokens
-        # aren't live tmux format variables — battery.tmux does a one-time
-        # textual substitution into status-right's *current* value when its
-        # own run-shell executes, so the placeholders must already be in
-        # status-right (and catppuccin's default status-right already
-        # overridden) by that point. This also runs after catppuccin above,
-        # so it wins over catppuccin's own default status-right.
-        #
-        # battery_charging_watts is macOS-only (empty string on Linux) but
-        # harmless to include everywhere.
         extraConfig = ''
           set -g @batt_remain_short 'true'
           set -g status-right '#{battery_color_bg} #{battery_percentage} #{battery_icon_status} #{battery_remain} #{battery_charging_watts}#[default] %a %b %d %I:%M %p '
@@ -275,11 +239,9 @@
     };
   };
 
-  # Public keys, the 1Password agent's vault list, and per-identity SSH/git
-  # config are all generated at activation time — see home/identities.nix.
-
   home.sessionVariables = {
     EDITOR = "nvim";
+    FZF_DEFAULT_OPTS = "--walker-skip=.git,node_modules,result";
   };
 
   home.sessionPath = [

@@ -17,6 +17,17 @@
   # Broadcom wifi on Asahi only works via iwd; wpa_supplicant (the
   # NetworkManager default) can't drive this card.
   networking.networkmanager.wifi.backend = "iwd";
+
+  # laptop.nix turns on automatic-timezoned, but the Asahi brcmfmac driver
+  # reports fake, sequential BSSIDs for every network except the one we're
+  # connected to — geoclue's WiFi-based location lookup can never match those
+  # against a real AP database, so the lookup just hangs forever. geoclue then
+  # idles out after 60s, automatic-timezoned's pending D-Bus call dies with
+  # "Remote peer disconnected", and systemd restarts it — a crash loop that
+  # never actually sets the timezone (stuck on UTC). No GPS/modem to fall back
+  # to either, so just set it statically until the driver improves.
+  services.automatic-timezoned.enable = lib.mkForce false;
+  time.timeZone = "America/Detroit";
   # This machine was first installed via the Asahi installer's unstable-based
   # ISO, which self-reports as 26.11 — unlike the other hosts, this is NOT
   # "26.05" to match them. stateVersion records whatever version a machine
@@ -65,5 +76,26 @@
   home-manager.users.jack.imports = [
     ../../home/common.nix
     ../../home/desktop.nix
+  ];
+
+  # Regular `discord` (gated to x86_64-linux in graphical.nix) has no Linux
+  # aarch64 build. vesktop is an Electron-based, Discord-API-compatible
+  # client that does ship official aarch64-linux builds.
+  environment.systemPackages = [ pkgs.vesktop ];
+
+  # Night Light, set to automatic sunset/sunrise scheduling by request. In
+  # practice this won't actually turn on or off by itself right now: it
+  # depends on geoclue for sunset/sunrise times, and geoclue can't resolve a
+  # location here for the same reason automatic-timezoned is disabled above
+  # (confirmed live — night-light-last-coordinates stays stuck at GNOME's
+  # invalid (91, 181) sentinel). Flip night-light-schedule-automatic to false
+  # plus explicit -from/-to hours for a schedule that actually activates.
+  programs.dconf.profiles.user.databases = [
+    {
+      settings."org/gnome/settings-daemon/plugins/color" = {
+        night-light-enabled = true;
+        night-light-schedule-automatic = true;
+      };
+    }
   ];
 }

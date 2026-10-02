@@ -1,5 +1,4 @@
-# Home-manager config for graphical machines only (terminal emulator, GUI
-# desktop entries).
+# home-manager config for graphical machines
 { config, pkgs, lib, ... }:
 
 {

@@ -32,10 +32,6 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
 fi
 
 if ! op vault list >/dev/null 2>&1; then
-  # Not `op whoami`: this fleet authenticates via the desktop app's CLI
-  # integration (Settings > Developer), not `op signin`, and `op whoami`
-  # specifically requires a traditional signin session even though ordinary
-  # commands like `op item get` work fine under app integration alone.
   echo "generate-identities: 1Password CLI not authorized (desktop app locked, or CLI integration off in Settings > Developer?), skipping" >&2
   exit 0
 fi
@@ -85,7 +81,7 @@ for ((i = 0; i < entry_count; i++)); do
 
   pubkey_file="$SSH_KEYS_DIR/id_$slug.pub"
   printf '%s\n' "$public_key" >"$pubkey_file"
-  chmod 644 "$pubkey_file"
+  chmod 600 "$pubkey_file"
 
   if [[ "$is_default" == "true" ]]; then
     ((default_count += 1))

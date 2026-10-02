@@ -1,4 +1,4 @@
-# Shared graphical base
+# shared graphical base
 { config, lib, pkgs, ... }:
 
 {
@@ -29,6 +29,16 @@
         "org/gnome/desktop/wm/keybindings" = {
           switch-to-workspace-left = [ "<Super><Control>h" "<Super><Control>Left" ];
           switch-to-workspace-right = [ "<Super><Control>l" "<Super><Control>Right" ];
+        };
+        "org/gnome/desktop/wm/preferences" = {
+          resize-with-right-button = true;
+          button-layout = "appmenu:minimize,maximize,close";
+        };
+        "org/gnome/shell/app-switcher" = {
+          current-workspace-only = true;
+        };
+        "org/gnome/shell/window-switcher" = {
+          current-workspace-only = true;
         };
       };
     }
