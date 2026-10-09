@@ -1,4 +1,4 @@
-# mouse — desktop workstation. STUB: needs a real hardware-configuration.nix
+# G16CHR Asus Strix desktop. STUB: needs a real hardware-configuration.nix
 # (run `nixos-generate-config` on the machine) before it will build.
 { config, lib, pkgs, inputs, ... }:
 
@@ -8,7 +8,7 @@
     ../../modules/roles/desktop.nix
   ];
 
-  networking.hostName = "mouse";
+  networking.hostName = "g16";
   # TODO: if this machine uses ZFS, import ../../modules/zfs.nix and set a
   # unique networking.hostId here.
   system.stateVersion = "26.05";
