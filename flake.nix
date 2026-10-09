@@ -1,5 +1,5 @@
 {
-  description = "NixOS fleet (x13, mouse, tank, m1)";
+  description = "NixOS fleet (x13, g16, tank, m1)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -18,16 +18,13 @@
     # doesn't build or doesn't match the firmware the Asahi installer laid
     # down on the machine's boot partition.
     nixos-apple-silicon.url = "github:nix-community/nixos-apple-silicon";
+    # Declarative Flatpak management (g16).
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
   outputs = inputs@{ self, nixpkgs, nixpkgs-unstable, lanzaboote, home-manager, nixos-apple-silicon, ... }:
     let
-      # Pull fast-moving AI CLI tools straight from nixpkgs-unstable so they
-      # don't lag behind the nixos-26.05 release branch. Built with
-      # allowUnfree directly (rather than via `prev.config`) since some of
-      # these are unfree and this pkgs instance doesn't otherwise inherit it.
-      # Reads `prev.system` rather than hardcoding one so this same overlay
-      # also works for the aarch64-linux m1 host.
+      # nixpkgs-unstable packages
       unstableOverlay = final: prev:
         let
           pkgsUnstable = import nixpkgs-unstable {
@@ -61,7 +58,7 @@
     {
       nixosConfigurations = {
         x13 = mkHost "x13" { };
-        mouse = mkHost "mouse" { };
+        g16 = mkHost "g16" { };
         tank = mkHost "tank" { };
 
         # MacBook Pro (M1), bare-metal Asahi Linux. See hosts/m1/default.nix.

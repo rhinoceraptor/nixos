@@ -119,4 +119,6 @@
   users.groups.ubertooth = {};
   users.users.jack.extraGroups = [ "ubertooth" ];
   services.udev.packages = [ pkgs.ubertooth pkgs.python312Packages.rfcat ];
+
+  programs.nix-ld.enable = true;
 }

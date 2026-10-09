@@ -1,17 +1,34 @@
-# G16CHR Asus Strix desktop. STUB: needs a real hardware-configuration.nix
-# (run `nixos-generate-config` on the machine) before it will build.
+# G16CHR Asus Strix desktop
 { config, lib, pkgs, inputs, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
+    ../../modules/zfs.nix
     ../../modules/roles/desktop.nix
+    inputs.nix-flatpak.nixosModules.nix-flatpak
   ];
 
   networking.hostName = "g16";
-  # TODO: if this machine uses ZFS, import ../../modules/zfs.nix and set a
-  # unique networking.hostId here.
-  system.stateVersion = "26.05";
+  networking.hostId = "7c0ee4ed";
+  time.timeZone = "America/Detroit";
+  system.stateVersion = "25.05";
+
+  boot.kernelParams = [ "nvidia-drm.fbdev=0" ];
+  boot.enableContainers = true;
+  systemd.tpm2.enable = true;
+
+  services.flatpak = {
+    enable = true;
+    remotes = [{
+      name = "flathub";
+      location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+    }];
+    packages = [
+      "com.bambulab.BambuStudio"
+    ];
+  };
+
 
   home-manager.users.jack.imports = [
     ../../home/common.nix

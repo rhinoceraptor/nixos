@@ -8,6 +8,12 @@
 
   networking.networkmanager.enable = true;
 
+  services.xserver.xkb = {
+    layout = "us";
+    options = "ctrl:nocaps";
+  };
+  console.useXkbConfig = true;
+
   hardware.enableRedistributableFirmware = true;
   services.fwupd.enable = true;
 
@@ -31,7 +37,7 @@
 
   users.users.jack = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "networkmanager" "video" "dialout" "wireshark" ];
+    extraGroups = [ "input" "wheel" "docker" "networkmanager" "video" "dialout" "wireshark" ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -40,6 +46,7 @@
 
     # version control
     git
+    git-lfs
     jujutsu
 
     # shell utilities
@@ -53,6 +60,9 @@
     unzip
     zip
     envsubst
+    yt-dlp
+    asciinema_3
+
 
     # toolchains and build tools
     gcc
@@ -92,6 +102,8 @@
     pandoc
     imagemagick
     tesseract
+    ocrmypdf
+    libreoffice
     (texlive.combine {
       inherit (texlive)
         scheme-small

@@ -1,41 +1,13 @@
 # Jack's NixOS Configs
 
-A flake-based NixOS fleet, driven by [Home Manager](https://github.com/nix-community/home-manager) for everything user-level. One repo, three machines, each importing only the pieces it needs.
-
-## Overview
-
-Every host is built the same way: `modules/common.nix` (system-wide defaults every machine gets) plus one *role* module (`modules/roles/{laptop,desktop,server}.nix`) plus whatever's specific to that host in `hosts/<name>/default.nix`. Home Manager config follows the same idea — `home/common.nix` is universal, `home/desktop.nix` is opt-in for graphical machines.
-
-```
-flake.nix                  # inputs, overlays, the three nixosConfigurations
-modules/
-  common.nix                # every host: shell, dev tooling, docker, tailscale, ssh, the primary user...
-  zfs.nix                   # opt-in: ZFS support (hosts using it need a unique networking.hostId)
-  roles/
-    graphical.nix            # shared GUI base: GNOME, 1Password, browsers, apps
-    laptop.nix                # graphical.nix + mobility (auto-timezone, geoclue, suspend fixes)
-    desktop.nix               # graphical.nix, no laptop-specific tweaks
-    server.nix                 # headless, no graphical stack
-hosts/
-  x13/                        # ThinkPad X13 laptop — ZFS-on-LUKS, TPM, SDR/RF hardware
-  mouse/                       # desktop workstation (STUB, see below)
-  tank/                         # headless server (STUB, see below)
-home/
-  common.nix                    # every host: git, ssh, tmux, neovim, zsh...
-  desktop.nix                    # graphical machines only: wezterm, desktop entries
-  identities.nix                  # wires up the generated SSH/git identity config (see below)
-  identities.example.json          # template for the untracked identities config
-  scripts/
-    generate-identities.sh          # regenerates SSH/git identity config from 1Password at every activation
-```
-
 ### Hosts
 
-| Host  | Role      | Notes |
+| Host | Role | Notes |
 |-------|-----------|-------|
-| `x13` | laptop    | ZFS on LUKS, TPM enabled, secure-boot (lanzaboote) imported but not yet turned on, SDR/RF hobby hardware (HackRF, Ubertooth, GNU Radio, etc.) |
-| `mouse` | desktop | **Stub** — needs a real `hosts/mouse/hardware-configuration.nix` (run `nixos-generate-config` on the machine) before it'll build |
-| `tank` | server   | **Stub** — same as above, plus needs a unique `networking.hostId` for ZFS (see the `TODO` comment in `hosts/tank/default.nix`) |
+| `x13` | laptop | ZFS on LUKS, TPM enabled, secure-boot (lanzaboote) imported but not yet turned on |
+| `m1` | laptop | M1 Pro Macbook Pro |
+| `g16` | desktop | Asus Strix G16CHR |
+| `tank` | server | stub |
 
 ## Prerequisites
 
@@ -50,7 +22,7 @@ Rebuild a host:
 sudo nixos-rebuild switch --flake /etc/nixos#x13
 ```
 
-(substitute `mouse` or `tank` once they have real hardware configs.)
+(substitute `g16` or `m1`, or `tank` once it has a real hardware config.)
 
 Check what a host would build without switching:
 
@@ -90,17 +62,3 @@ This repo is public, so no email addresses, public keys, or org names live in it
    - `githubOrgs` (optional) → auto-rewrites `git@github.com:org/...` to use that alias, so normal-looking clone URLs still pick up the right key.
 
 4. `sudo nixos-rebuild switch --flake /etc/nixos#<host>`.
-
-### What gets generated (all untracked, regenerated every activation)
-
-- `~/.ssh/op-identities/id_<slug>.pub` — each identity's public key
-- `~/.ssh/generated-identities.config` — `Host` blocks, included from the top of `~/.ssh/config`
-- `~/.config/git/generated-identities.gitconfig` — default `user.email`, `includeIf`/`url.insteadOf` blocks, included from `~/.config/git/config`
-- `~/.config/git/identities/<slug>.gitconfig` — per-identity `user.email`
-- `~/.config/1Password/ssh/agent.toml` — vault list for the SSH agent, derived from whichever vaults your configured items live in
-
-If `~/.config/nixos-identities.json` doesn't exist, or 1Password isn't authorized, the script logs a message and exits cleanly — a fresh clone of this repo (or a machine that hasn't set up 1Password yet) still activates fine, just with no identities configured (and `git commit` will say "Please tell me who you are" until one's set up).
-
-## Cross-OS notes
-
-`home/common.nix` is mostly Linux-specific today (e.g. `pkgs.acpi` is only pulled in `lib.optionals pkgs.stdenv.isLinux`). There's a `nix-darwin` branch with WIP work toward running this same Home Manager config on macOS; the flake doesn't expose a `nix-darwin`/`homeConfigurations` output yet.
