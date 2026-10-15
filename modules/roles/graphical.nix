@@ -70,6 +70,7 @@
     obs-studio
     reaper
     gnome-sound-recorder
+    spotify-player
 
     # Graphics & design
     gimp

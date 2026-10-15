@@ -189,6 +189,23 @@
         });
         extraConfig = ''
           set -g @batt_remain_short 'true'
+          # Catppuccin Mocha: green -> yellow -> peach -> red, crust text
+          set -g @batt_color_charge_primary_tier8 '#a6e3a1'
+          set -g @batt_color_charge_primary_tier7 '#a6e3a1'
+          set -g @batt_color_charge_primary_tier6 '#a6e3a1'
+          set -g @batt_color_charge_primary_tier5 '#f9e2af'
+          set -g @batt_color_charge_primary_tier4 '#f9e2af'
+          set -g @batt_color_charge_primary_tier3 '#fab387'
+          set -g @batt_color_charge_primary_tier2 '#f38ba8'
+          set -g @batt_color_charge_primary_tier1 '#f38ba8'
+          set -g @batt_color_charge_secondary_tier8 '#11111b'
+          set -g @batt_color_charge_secondary_tier7 '#11111b'
+          set -g @batt_color_charge_secondary_tier6 '#11111b'
+          set -g @batt_color_charge_secondary_tier5 '#11111b'
+          set -g @batt_color_charge_secondary_tier4 '#11111b'
+          set -g @batt_color_charge_secondary_tier3 '#11111b'
+          set -g @batt_color_charge_secondary_tier2 '#11111b'
+          set -g @batt_color_charge_secondary_tier1 '#11111b'
           set -g status-right '#{battery_color_bg} #{battery_percentage} #{battery_icon_status} #{battery_remain} #{battery_charging_watts}#[default] %a %b %d %I:%M %p '
         '';
       }

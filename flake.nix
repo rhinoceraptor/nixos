@@ -17,7 +17,7 @@
     # patches/firmware, and pinning it to our nixos-26.05 risks a kernel that
     # doesn't build or doesn't match the firmware the Asahi installer laid
     # down on the machine's boot partition.
-    nixos-apple-silicon.url = "github:nix-community/nixos-apple-silicon";
+    nixos-apple-silicon.url = "github:nix-community/nixos-apple-silicon/main";
     # Declarative Flatpak management (g16).
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
