@@ -35,16 +35,18 @@
         bd = "branch -D";
         c = "commit";
         cm = "commit -m";
+        cma = "commit --amend --no-edit";
         co = "checkout";
         cb = "checkout -b";
         cl = "clone";
-        d = "diff HEAD --ignore-space-at-eol -b -w";
+        d = "diff HEAD -w";
         s = "status";
         st = "stash";
-        sd = "stash shop -p";
+        sd = "stash show -p";
         sp = "stash pop";
+        sh = "show HEAD";
         stls = "stash list";
-        l = "log --pretty=oneline --decorate --abbrev-commit --mac-count=15";
+        l = "log --pretty=oneline --decorate --abbrev-commit --max-count=15";
         ll = "log --graph --pretty=format:'%Cred%h%Creset %an: %s %Creset%Cgreen(%cr)%Creset' --abbrev-commit --date=relative";
       };
     };
@@ -96,6 +98,7 @@
       vim.opt.matchtime = 1
       vim.opt.shell = "zsh"
       vim.opt.redrawtime = 10000
+      vim.opt.autoread = false
 
       vim.keymap.set("n", "<C-p>", ":FZF<CR>")
       vim.keymap.set("n", "<F3>", ":Neotree toggle<CR>", { silent = true })
