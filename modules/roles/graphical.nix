@@ -9,6 +9,12 @@
   services.pipewire.enable = true;
   services.printing.enable = true;
 
+  # Some apps (e.g. Element) ignore SIGTERM, stalling logout/shutdown for the
+  # default 90s before systemd SIGKILLs them.
+  systemd.user.extraConfig = ''
+    DefaultTimeoutStopSec=10s
+  '';
+
   programs.firefox.enable = true;
   programs._1password.enable = true;
   programs._1password-gui = {
