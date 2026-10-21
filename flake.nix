@@ -28,7 +28,7 @@
       unstableOverlay = final: prev:
         let
           pkgsUnstable = import nixpkgs-unstable {
-            inherit (prev) system;
+            system = prev.stdenv.hostPlatform.system;
             config.allowUnfree = true;
           };
         in

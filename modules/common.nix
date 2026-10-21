@@ -61,7 +61,7 @@
     zip
     envsubst
     yt-dlp
-    asciinema_3
+    asciinema
 
 
     # toolchains and build tools
