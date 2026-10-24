@@ -99,7 +99,13 @@
       vim.opt.matchtime = 1
       vim.opt.shell = "zsh"
       vim.opt.redrawtime = 10000
-      vim.opt.autoread = false
+      vim.opt.autoread = true
+
+      -- autoread only fires on certain events, so poll for external changes
+      -- when regaining focus or idling; unmodified buffers reload silently.
+      vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+        command = "if mode() != 'c' | checktime | endif",
+      })
 
       vim.keymap.set("n", "<C-p>", ":FZF<CR>")
       vim.keymap.set("n", "<F3>", ":Neotree toggle<CR>", { silent = true })

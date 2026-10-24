@@ -8,7 +8,7 @@
     extraConfig = ''
       local wezterm = require "wezterm"
       return {
-        font_size = 12.0,
+        font_size = 11.0,
         color_scheme = "Catppuccin Mocha",
         hide_tab_bar_if_only_one_tab = true,
         window_content_alignment = {
