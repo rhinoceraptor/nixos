@@ -21,6 +21,15 @@
   '';
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
+  # /boot is only 476M, ~130M of it Asahi firmware/m1n1, and each kernel+initrd
+  # is ~91M, so it only fits ~3 distinct kernels.
+  boot.loader.systemd-boot.configurationLimit = 3;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
   home-manager.users.jack.imports = [
     ../../home/common.nix
     ../../home/desktop.nix
