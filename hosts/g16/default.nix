@@ -7,7 +7,16 @@
     ../../modules/zfs.nix
     ../../modules/roles/desktop.nix
     inputs.nix-flatpak.nixosModules.nix-flatpak
+    inputs.lanzaboote.nixosModules.lanzaboote
   ];
+
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/var/lib/sbctl";
+    configurationLimit = 5;
+  };
+  environment.systemPackages = [ pkgs.sbctl ];
 
   networking.hostName = "g16";
   networking.hostId = "7c0ee4ed";
